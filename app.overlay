@@ -1,0 +1,14 @@
+/ {
+    my_outputs {
+        compatible = "gpio-leds";
+
+        pa06_out: pa06_out {
+            gpios = <&pioa 6 GPIO_ACTIVE_HIGH>;
+            label = "PA06 Output";
+        };
+    };
+
+    aliases {
+        pa06-out = &pa06_out;
+    };
+};
