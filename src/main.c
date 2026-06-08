@@ -1,7 +1,11 @@
+#if 0
+
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/sys/printk.h>
+
+
 
 #define LED0_NODE    DT_ALIAS(led0)
 #define PA06_NODE    DT_ALIAS(pa06_out)
@@ -66,4 +70,60 @@ int main(void)
     }
 
     return 0;
+}
+
+#endif
+
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/uart.h>
+#include <zephyr/sys/printk.h>
+
+#define BT_UART_NODE DT_NODELABEL(usart0)
+
+static const struct device *bt_uart = DEVICE_DT_GET(BT_UART_NODE);
+
+static void bt_uart_cb(const struct device *dev, void *user_data)
+{
+    uint8_t c;
+    static uint32_t count = 0;
+
+    ARG_UNUSED(user_data);
+
+    uart_irq_update(dev);
+
+    while (uart_irq_rx_ready(dev)) {
+        while (uart_fifo_read(dev, &c, 1) == 1) {
+
+            if (c >= 32 && c <= 126) {
+                printk("BT RX: char='%c', hex=0x%02X\n", c, c);
+            } else {
+                printk("BT RX: non-printable, hex=0x%02X\n", c);
+            }
+        }
+    }
+
+    printk("%d\n", ++count);
+}
+
+int main(void)
+{
+    if (!device_is_ready(bt_uart)) {
+        printk("Bluetooth UART not ready\n");
+        return 0;
+    }
+
+    uart_irq_callback_user_data_set(bt_uart, bt_uart_cb, NULL);
+    uart_irq_rx_enable(bt_uart);
+
+    printk("Bluetooth UART test started\n");
+
+    while (1) {
+        uart_poll_out(bt_uart, 'H');
+        uart_poll_out(bt_uart, 'i');
+        uart_poll_out(bt_uart, '\r');
+        uart_poll_out(bt_uart, '\n');
+
+        k_sleep(K_SECONDS(1));
+    }
 }
