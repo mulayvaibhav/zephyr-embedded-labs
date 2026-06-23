@@ -7,9 +7,13 @@ target_sources(app PRIVATE
     src/main.c
 
     apps/bluetooth_rx/bluetooth_rx.c
+    apps/vehicle_command_parser/vehicle_command_parser.c
+    apps/vehicle_control_manager/vehicle_control_manager.c
 )
 
 target_include_directories(app PRIVATE
     include
     apps/bluetooth_rx
+    apps/vehicle_command_parser
+    apps/vehicle_control_manager
 )
