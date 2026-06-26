@@ -2,9 +2,11 @@
 #include <zephyr/sys/printk.h>
 #include "bluetooth_rx.h"
 #include "vehicle_control_manager.h"
+#include "motor_driver.h"
 
 int main(void)
 {
+    int ret = 0;
     vehicle_control_config_t config = {
         .default_speed_limit_pct = 40,
         .default_ttl_ms = 400,
@@ -21,8 +23,16 @@ int main(void)
     };
 
     bluetooth_rx_init();
+
     /* Initialize Vehicle command manager */
     vehicle_control_manager_init( &config );
+
+    /* Initialize motor driver */
+    ret = motor_driver_init();
+    if (ret != 0) {
+        printk("motor_driver_init failed: %d\n", ret);
+        return 0;
+    }
 
     while (1) {        
         k_sleep(K_SECONDS(1));

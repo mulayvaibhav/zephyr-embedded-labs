@@ -9,6 +9,8 @@ target_sources(app PRIVATE
     apps/bluetooth_rx/bluetooth_rx.c
     apps/vehicle_command_parser/vehicle_command_parser.c
     apps/vehicle_control_manager/vehicle_control_manager.c
+
+    drivers/motor_driver/motor_driver.c
 )
 
 target_include_directories(app PRIVATE
@@ -16,4 +18,6 @@ target_include_directories(app PRIVATE
     apps/bluetooth_rx
     apps/vehicle_command_parser
     apps/vehicle_control_manager
+
+    drivers/motor_driver
 )

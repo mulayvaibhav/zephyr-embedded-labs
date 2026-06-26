@@ -1,3 +1,6 @@
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/pwm/pwm.h>
+
 / {
     my_outputs {
         compatible = "gpio-leds";
@@ -8,10 +11,94 @@
         };
     };
 
-    aliases {
-        pa06-out = &pa06_out;
+    motor_direction_pins {
+        compatible = "gpio-leds";
+
+        motor_lf_in1: motor_lf_in1 {
+            gpios = <&piod 26 GPIO_ACTIVE_HIGH>;
+            label = "Motor LF IN1";
+        };
+
+        motor_lf_in2: motor_lf_in2 {
+            gpios = <&pioc 31 GPIO_ACTIVE_HIGH>;
+            label = "Motor LF IN2";
+        };
+
+        motor_lr_in1: motor_lr_in1 {
+            gpios = <&piod 30 GPIO_ACTIVE_HIGH>;
+            label = "Motor LR IN1";
+        };
+
+        motor_lr_in2: motor_lr_in2 {
+            gpios = <&pioc 13 GPIO_ACTIVE_HIGH>;
+            label = "Motor LR IN2";
+        };
+
+        motor_rf_in1: motor_rf_in1 {
+            gpios = <&piod 24 GPIO_ACTIVE_HIGH>;
+            label = "Motor RF IN1";
+        };
+
+        motor_rf_in2: motor_rf_in2 {
+            gpios = <&pioa 10 GPIO_ACTIVE_HIGH>;
+            label = "Motor RF IN2";
+        };
+
+        motor_rr_in1: motor_rr_in1 {
+            gpios = <&pioa 22 GPIO_ACTIVE_HIGH>;
+            label = "Motor RR IN1";
+        };
+
+        motor_rr_in2: motor_rr_in2 {
+            gpios = <&piob 13 GPIO_ACTIVE_HIGH>;
+            label = "Motor RR IN2";
+        };
     };
 
+    motor_pwm_outputs {
+        compatible = "pwm-leds";
+
+        motor_lf_pwm: motor_lf_pwm {
+            pwms = <&pwm0 0 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
+            label = "Motor LF PWM";
+        };
+
+        motor_lr_pwm: motor_lr_pwm {
+            pwms = <&pwm0 3 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
+            label = "Motor LR PWM";
+        };
+
+        motor_rf_pwm: motor_rf_pwm {
+            pwms = <&pwm0 2 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
+            label = "Motor RF PWM";
+        };
+
+        motor_rr_pwm: motor_rr_pwm {
+            pwms = <&pwm0 1 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
+            label = "Motor RR PWM";
+        };
+    };
+
+    aliases {
+        pa06-out = &pa06_out;
+
+        motor-lf-in1 = &motor_lf_in1;
+        motor-lf-in2 = &motor_lf_in2;
+
+        motor-lr-in1 = &motor_lr_in1;
+        motor-lr-in2 = &motor_lr_in2;
+
+        motor-rf-in1 = &motor_rf_in1;
+        motor-rf-in2 = &motor_rf_in2;
+
+        motor-rr-in1 = &motor_rr_in1;
+        motor-rr-in2 = &motor_rr_in2;
+
+        motor-lf-pwm = &motor_lf_pwm;
+        motor-lr-pwm = &motor_lr_pwm;
+        motor-rf-pwm = &motor_rf_pwm;
+        motor-rr-pwm = &motor_rr_pwm;
+    };
 };
 
 &usart0 {
@@ -19,4 +106,8 @@
     current-speed = <9600>;
     pinctrl-0 = <&usart0_default>;
     pinctrl-names = "default";
+};
+
+&pwm0 {
+    status = "okay";
 };

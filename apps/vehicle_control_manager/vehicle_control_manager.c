@@ -1,3 +1,5 @@
+#include <zephyr/kernel.h>
+#include <zephyr/device.h>
 #include "vehicle_control_manager.h"
 
 #include <string.h>
@@ -9,7 +11,16 @@
 #define DEFAULT_RAMP_DOWN_PCT_PER_SEC (160u)
 #define DEFAULT_MAX_UPDATE_DT_MS      (100u)
 
+#define MY_STACK_SIZE 1024
+#define MY_PRIORITY   5
+
+K_THREAD_STACK_DEFINE(motor_driver_stack_area, MY_STACK_SIZE);
+static struct k_thread motor_driver_thread_data;
+static k_tid_t motor_driver_thread_id;
+
 static vehicle_control_manager_t mgr;
+
+static void run_motor_driver_thread(void *p1, void *p2, void *p3);
 
 static int16_t clamp_i16(int16_t value, int16_t min_value, int16_t max_value)
 {
@@ -242,6 +253,19 @@ void vehicle_control_manager_init(const vehicle_control_config_t *config)
     }
 
     mgr.current_speed_limit_pct = mgr.config.default_speed_limit_pct;
+
+    /* Start the motor driver thread */
+
+    motor_driver_thread_id = k_thread_create(
+        &motor_driver_thread_data,
+        motor_driver_stack_area,
+        K_THREAD_STACK_SIZEOF(motor_driver_stack_area),
+        run_motor_driver_thread,
+        NULL, NULL, NULL,
+        MY_PRIORITY,
+        0,
+        K_NO_WAIT
+    );
 }
 
 void vehicle_control_manager_handle_command(vehicle_control_manager_t *mgr,
@@ -398,4 +422,12 @@ void vehicle_control_manager_clear_emergency_stop(vehicle_control_manager_t *mgr
     mgr->target_right_pct = 0;
     mgr->current_left_pct = 0;
     mgr->current_right_pct = 0;
+}
+
+static void run_motor_driver_thread(void *p1, void *p2, void *p3)
+{
+    while (1) {
+    
+        k_msleep(50);
+    }
 }
