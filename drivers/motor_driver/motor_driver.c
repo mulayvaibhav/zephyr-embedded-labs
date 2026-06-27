@@ -516,27 +516,34 @@ int motor_driver_init(void)
 {
     int ret;
 
-    for (size_t i = 0u; i < MOTOR_ID_COUNT; i++) {
+    printk("motor_driver_init: start\n");
+
+    for (size_t i = 0; i < MOTOR_ID_COUNT; i++) {
+        printk("motor_driver_init: checking %s\n", g_motors[i].name);
+
         ret = motor_check_ready(&g_motors[i]);
+        printk("motor_driver_init: motor_check_ready(%s) = %d\n",
+               g_motors[i].name, ret);
         if (ret != 0) {
             return ret;
         }
 
         ret = motor_configure_gpio(&g_motors[i]);
+        printk("motor_driver_init: motor_configure_gpio(%s) = %d\n",
+               g_motors[i].name, ret);
         if (ret != 0) {
             return ret;
         }
 
         ret = motor_stop_one(&g_motors[i]);
+        printk("motor_driver_init: motor_stop_one(%s) = %d\n",
+               g_motors[i].name, ret);
         if (ret != 0) {
-            printk("Failed to stop motor %s during init, ret=%d\n",
-                   g_motors[i].name,
-                   ret);
             return ret;
         }
     }
 
-    printk("Motor driver initialized\n");
+    printk("motor_driver_init: done\n");
 
     return 0;
 }

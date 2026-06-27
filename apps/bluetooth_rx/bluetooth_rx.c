@@ -120,6 +120,12 @@ static bool detect_command_from_stream(char incoming_char,
         return true;
     }
 
+    if (rolling_buffer_ends_with(rolling_buf, "DOWN")) {
+        strncpy(detected_cmd, "DOWN", detected_cmd_size - 1);
+        detected_cmd[detected_cmd_size - 1] = '\0';
+        return true;
+    }
+
     if (rolling_buffer_ends_with(rolling_buf, "LFT")) {
         strncpy(detected_cmd, "LFT", detected_cmd_size - 1);
         detected_cmd[detected_cmd_size - 1] = '\0';
@@ -150,11 +156,11 @@ static bool detect_command_from_stream(char incoming_char,
         return true;
     }
 
-    if (rolling_buffer_ends_with(rolling_buf, "D")) {
-        strncpy(detected_cmd, "D", detected_cmd_size - 1);
-        detected_cmd[detected_cmd_size - 1] = '\0';
-        return true;
-    }
+    //if (rolling_buffer_ends_with(rolling_buf, "D")) {
+    //    strncpy(detected_cmd, "D", detected_cmd_size - 1);
+    //    detected_cmd[detected_cmd_size - 1] = '\0';
+    //    return true;
+    //}
 
     return false;
 }

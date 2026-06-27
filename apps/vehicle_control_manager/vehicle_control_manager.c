@@ -427,20 +427,56 @@ void vehicle_control_manager_clear_emergency_stop(vehicle_control_manager_t *mgr
 
 static void run_motor_driver_thread(void *p1, void *p2, void *p3)
 {
+    ARG_UNUSED(p1);
+    ARG_UNUSED(p2);
+    ARG_UNUSED(p3);
+
     vehicle_motor_output_t motor_out = {0};
-    vehicle_control_manager_t * mgr = NULL;  
+    vehicle_control_manager_t *mgr = NULL;
+
     int ret = 0;
+    int16_t last_left_pct = 0;
+    int16_t last_right_pct = 0;
+    bool output_applied_once = false;
 
     while (1) {
-        if( NULL == mgr ) {
+        if (mgr == NULL) {
             mgr = get_vehicle_manager_inst();
+
+            if (mgr == NULL) {
+                printk("Motor thread: vehicle manager not ready\n");
+                k_msleep(100);
+                continue;
+            }
         }
 
-        motor_out = vehicle_control_manager_update( mgr, k_uptime_get_32());
-        ret = motor_driver_set_left_right( motor_out.left_pct, motor_out.right_pct );
-        if( ret != 0 ) {
-            printk(" Motor driver failed, returned error no.[%d]\n ", ret);
+        motor_out = vehicle_control_manager_update(mgr, k_uptime_get_32());
+
+        if ((!output_applied_once) ||
+            (last_left_pct != motor_out.left_pct) ||
+            (last_right_pct != motor_out.right_pct)) {
+
+            printk("Applying motor outputs: left_pct=%d, right_pct=%d\n",
+                   motor_out.left_pct,
+                   motor_out.right_pct);
+
+            ret = motor_driver_set_left_right(motor_out.left_pct,
+                                              motor_out.right_pct);
+
+            if (ret != 0) {
+                printk("Motor driver failed, ret=%d\n", ret);
+
+                /*
+                 * Do not update last_left_pct / last_right_pct here.
+                 * We want to retry next loop.
+                 */
+            } else {
+                last_left_pct = motor_out.left_pct;
+                last_right_pct = motor_out.right_pct;
+                output_applied_once = true;
+            }
         }
+
         k_msleep(20);
     }
 }
