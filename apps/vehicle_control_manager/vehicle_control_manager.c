@@ -1,6 +1,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include "vehicle_control_manager.h"
+#include "motor_driver.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -426,8 +427,20 @@ void vehicle_control_manager_clear_emergency_stop(vehicle_control_manager_t *mgr
 
 static void run_motor_driver_thread(void *p1, void *p2, void *p3)
 {
+    vehicle_motor_output_t motor_out = {0};
+    vehicle_control_manager_t * mgr = NULL;  
+    int ret = 0;
+
     while (1) {
-    
-        k_msleep(50);
+        if( NULL == mgr ) {
+            mgr = get_vehicle_manager_inst();
+        }
+
+        motor_out = vehicle_control_manager_update( mgr, k_uptime_get_32());
+        ret = motor_driver_set_left_right( motor_out.left_pct, motor_out.right_pct );
+        if( ret != 0 ) {
+            printk(" Motor driver failed, returned error no.[%d]\n ", ret);
+        }
+        k_msleep(20);
     }
 }
