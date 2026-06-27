@@ -1,5 +1,6 @@
 #include <zephyr/dt-bindings/gpio/gpio.h>
 #include <zephyr/dt-bindings/pwm/pwm.h>
+#include <dt-bindings/pinctrl/samv71q-pinctrl.h>
 
 / {
     motor_direction_pins {
@@ -11,6 +12,7 @@
          *   PB03 -> Left Front  IN2
          *   PA05 -> Left Rear   IN1
          *   PA24 -> Left Rear   IN2
+         *
          *   PD28 -> Right Front IN1
          *   PA06 -> Right Front IN2
          *   PC31 -> Right Rear  IN1
@@ -67,12 +69,13 @@
         compatible = "pwm-leds";
 
         /*
-         * PWM pins kept same:
-         *   PA00 -> PWM channel 0
-         *   PD27 -> PWM channel 3
-         *   PC19 -> PWM channel 2
-         *   PA02 -> PWM channel 1
-         */
+        * PWM pins:
+        *   PD20 -> PWM channel 0 -> Left Front ENA
+        *   PD27 -> PWM channel 3 -> Left Rear  ENB
+        *
+        *   PC19 -> PWM channel 2 -> Right Front ENA
+        *   PA02 -> PWM channel 1 -> Right Rear  ENB
+        */
 
         motor_lf_pwm: motor_lf_pwm {
             pwms = <&pwm0 0 PWM_MSEC(1) PWM_POLARITY_NORMAL>;
