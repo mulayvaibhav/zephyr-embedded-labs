@@ -18,7 +18,10 @@
          *   PC31 -> Right Rear  IN1
          *   PC13 -> Right Rear  IN2
          *
-         * Avoided:
+         * Avoided: 
+
+
+
          *   PB00 / PB01 -> USART0 HC-05
          *   PD26 / PD24 / PA10 / PA22 -> Audio-related pins
          *   PA00 / PD27 / PC19 / PA02 -> PWM pins
@@ -73,7 +76,7 @@
         *   PD20 -> PWM channel 0 -> Left Front ENA
         *   PD27 -> PWM channel 3 -> Left Rear  ENB
         *
-        *   PC19 -> PWM channel 2 -> Right Front ENA
+        *   PD26 -> PWM channel 2 -> Right Front ENA
         *   PA02 -> PWM channel 1 -> Right Rear  ENB
         */
 
