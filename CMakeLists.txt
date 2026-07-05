@@ -20,21 +20,25 @@ else()
 endif()
 
 target_sources(app PRIVATE
-    src/main.c
 
     apps/vehicle_command_parser/vehicle_command_parser.c
 )
 
 if("${HW_BOARD}" STREQUAL "ATSAMV71")
     target_sources(app PRIVATE
+        src/atsamv71_main.c
+
         apps/bluetooth_rx/bluetooth_rx.c
         apps/vehicle_control_manager/vehicle_control_manager.c
+
         drivers/motor_driver/motor_driver.c
     )
 endif()
 
 if("${HW_BOARD}" STREQUAL "STM32MP257")
     target_sources(app PRIVATE
+        src/stm32mp257_m33_main.c
+
         apps/stm32mp257_m33_ipc/ipc.c
     )
 endif()

@@ -5,17 +5,7 @@
 #include <errno.h>
 #include <string.h>
 
-#ifdef HW_BOARD_ATSAMV71
-#include "vehicle_control_manager.h"
-#include "motor_driver.h"
-#include "bluetooth_rx.h"
-#endif
-
-#ifdef HW_BOARD_STM32MP257
 #include "ipc.h"
-#endif
-
-#ifdef HW_BOARD_STM32MP257
 
 static int cmd_vehicle(const struct shell *shell, size_t argc, char **argv)
 {
@@ -48,13 +38,12 @@ static int cmd_vehicle(const struct shell *shell, size_t argc, char **argv)
 
 SHELL_CMD_REGISTER(vehicle, NULL, "Vehicle control command", cmd_vehicle);
 
-#endif
-
 int main(void)
 {
     printk("\n\n----->>>> \t Custom motor control starting \t <<<<-----\n\n");
-    int ret = 0;
+
 #ifdef HW_BOARD_ATSAMV71
+    int ret = 0;
     vehicle_control_config_t config = {
         .default_speed_limit_pct = 40,
         .default_ttl_ms = 400,
@@ -88,10 +77,7 @@ int main(void)
     bluetooth_rx_init();
 #endif
 
-
-#ifdef HW_BOARD_STM32MP257
     start_stm32mp257_openamp_ipc();
-#endif
 
     while (1) {        
         k_sleep(K_SECONDS(1));
