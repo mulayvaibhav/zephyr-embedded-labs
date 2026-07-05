@@ -1,0 +1,18 @@
+/*
+ * STM32MP257F-DK M33 OpenAMP shared memory configuration
+ */
+
+/ {
+        chosen {
+                /*
+                 * Shared memory reserved for inter-processor communication.
+                 */
+                zephyr,ipc_shm = &ipc_shmem;
+                zephyr,ipc = &mailbox;
+        };
+
+        ipc_shmem: memory1@81200000 {
+                compatible = "mmio-sram";
+                reg = <0x81200000 DT_SIZE_M(1)>;
+        };
+};

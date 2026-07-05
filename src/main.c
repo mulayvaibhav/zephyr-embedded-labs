@@ -1,13 +1,57 @@
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
-#include "bluetooth_rx.h"
+#include <zephyr/shell/shell.h>
+
+#include <errno.h>
+#include <string.h>
+
+#ifdef HW_BOARD_ATSAMV71
 #include "vehicle_control_manager.h"
 #include "motor_driver.h"
+#include "bluetooth_rx.h"
+#endif
+
+#ifdef HW_BOARD_STM32MP257
+#include "ipc.h"
+#endif
+
+static int cmd_vehicle(const struct shell *shell, size_t argc, char **argv)
+{
+    if (argc < 2) {
+        shell_print(shell, "Usage: vehicle <forward|backward|left|right|stop|estop>");
+        return -EINVAL;
+    }
+
+    const char *cmd = argv[1];
+
+    if (strcmp(cmd, "forward") == 0) {
+        shell_print(shell, "vehicle: forward");
+    } else if (strcmp(cmd, "backward") == 0) {
+        shell_print(shell, "vehicle: backward");
+    } else if (strcmp(cmd, "left") == 0) {
+        shell_print(shell, "vehicle: left");
+    } else if (strcmp(cmd, "right") == 0) {
+        shell_print(shell, "vehicle: right");
+    } else if (strcmp(cmd, "stop") == 0) {
+        shell_print(shell, "vehicle: stop");
+    } else if (strcmp(cmd, "estop") == 0) {
+        shell_print(shell, "vehicle: emergency stop");
+    } else {
+        shell_error(shell, "Unknown vehicle command: %s", cmd);
+        return -EINVAL;
+    }
+
+    return 0;
+}
+
+SHELL_CMD_REGISTER(vehicle, NULL, "Vehicle control command", cmd_vehicle);
+
 
 int main(void)
 {
     printk("\n\n----->>>> \t Custom motor control starting \t <<<<-----\n\n");
     int ret = 0;
+#ifdef HW_BOARD_ATSAMV71
     vehicle_control_config_t config = {
         .default_speed_limit_pct = 40,
         .default_ttl_ms = 400,
@@ -23,6 +67,7 @@ int main(void)
         .max_update_dt_ms = 100,
     };
 
+
     /* Initialize motor driver */
     ret = motor_driver_init();
     if (ret != 0) {
@@ -36,7 +81,14 @@ int main(void)
     /* Initialize Vehicle command manager */
     vehicle_control_manager_init( &config );
 
+
     bluetooth_rx_init();
+#endif
+
+
+#ifdef HW_BOARD_STM32MP257
+    start_stm32mp257_openamp_ipc();
+#endif
 
     while (1) {        
         k_sleep(K_SECONDS(1));
