@@ -15,6 +15,8 @@
 #include "ipc.h"
 #endif
 
+#ifdef HW_BOARD_STM32MP257
+
 static int cmd_vehicle(const struct shell *shell, size_t argc, char **argv)
 {
     if (argc < 2) {
@@ -46,6 +48,7 @@ static int cmd_vehicle(const struct shell *shell, size_t argc, char **argv)
 
 SHELL_CMD_REGISTER(vehicle, NULL, "Vehicle control command", cmd_vehicle);
 
+#endif
 
 int main(void)
 {

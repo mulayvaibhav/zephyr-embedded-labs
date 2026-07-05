@@ -23,14 +23,13 @@ target_sources(app PRIVATE
     src/main.c
 
     apps/vehicle_command_parser/vehicle_command_parser.c
-    #apps/vehicle_control_manager/vehicle_control_manager.c
-
-    #drivers/motor_driver/motor_driver.c
 )
 
 if("${HW_BOARD}" STREQUAL "ATSAMV71")
     target_sources(app PRIVATE
         apps/bluetooth_rx/bluetooth_rx.c
+        apps/vehicle_control_manager/vehicle_control_manager.c
+        drivers/motor_driver/motor_driver.c
     )
 endif()
 
@@ -44,14 +43,15 @@ target_include_directories(app PRIVATE
     include
 
     apps/vehicle_command_parser
-    #apps/vehicle_control_manager
-
-    #drivers/motor_driver
+    
 )
 
 if("${HW_BOARD}" STREQUAL "ATSAMV71")
     target_include_directories(app PRIVATE
         apps/bluetooth_rx
+        apps/vehicle_control_manager
+
+        drivers/motor_driver
     )
 endif()
 
