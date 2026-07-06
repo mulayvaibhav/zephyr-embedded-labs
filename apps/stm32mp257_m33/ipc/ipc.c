@@ -22,6 +22,8 @@
 #include <zephyr/shell/shell_rpmsg.h>
 #endif
 
+#include "rpmsg_processor.h"
+
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(openamp_rsc_table);
 
@@ -349,6 +351,12 @@ void rpmsg_mng_task(void *arg1, void *arg2, void *arg3)
 		goto task_end;
 	}
 
+	int ret_vehicle = vehicle_cmd_rpmsg_start(rpdev);
+	if (ret_vehicle != 0) {
+		LOG_ERR("Failed to create vehicle RPMsg endpoint: %d", ret_vehicle);
+		goto task_end;
+	}
+
 #ifdef CONFIG_SHELL_BACKEND_RPMSG
 	(void)shell_backend_rpmsg_init_transport(rpdev);
 #endif
@@ -370,6 +378,7 @@ task_end:
 void start_stm32mp257_openamp_ipc(void)
 {
 	LOG_INF("Starting application threads!");
+	
 	k_thread_create(&thread_mng_data, thread_mng_stack, APP_TASK_STACK_SIZE,
 			rpmsg_mng_task,
 			NULL, NULL, NULL, K_PRIO_COOP(8), 0, K_NO_WAIT);

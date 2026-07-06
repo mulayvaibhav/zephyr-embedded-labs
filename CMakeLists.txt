@@ -39,7 +39,8 @@ if("${HW_BOARD}" STREQUAL "STM32MP257")
     target_sources(app PRIVATE
         src/stm32mp257_m33_main.c
 
-        apps/stm32mp257_m33_ipc/ipc.c
+        apps/stm32mp257_m33/ipc/ipc.c
+        apps/stm32mp257_m33/rpmsg/rpmsg_processor.c
     )
 endif()
 
@@ -61,6 +62,7 @@ endif()
 
 if("${HW_BOARD}" STREQUAL "STM32MP257")
     target_include_directories(app PRIVATE
-        apps/stm32mp257_m33_ipc
+        apps/stm32mp257_m33/ipc
+        apps/stm32mp257_m33/rpmsg
     )
 endif()
