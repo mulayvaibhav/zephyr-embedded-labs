@@ -56,8 +56,10 @@ vehicle_control_manager_t * get_vehicle_manager_inst( void );
 
 void vehicle_control_manager_init(const vehicle_control_config_t *config);
 
-void vehicle_control_manager_handle_command(vehicle_control_manager_t *mgr,
+int vehicle_control_manager_handle_command(vehicle_control_manager_t *mgr,
                                             const vehicle_motion_command_t *cmd);
+
+int vehicle_control_manager_submit_command( const vehicle_motion_command_t *cmd );
 
 vehicle_motor_output_t vehicle_control_manager_update(vehicle_control_manager_t *mgr,
                                                       uint32_t now_ms);

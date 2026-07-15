@@ -393,15 +393,15 @@ void vehicle_control_manager_init(const vehicle_control_config_t *config)
  * @param mgr Vehicle control manager instance.
  * @param cmd Incoming vehicle motion command.
  */
-void vehicle_control_manager_handle_command(vehicle_control_manager_t *mgr,
+int vehicle_control_manager_handle_command(vehicle_control_manager_t *mgr,
                                             const vehicle_motion_command_t *cmd)
 {
     if ((mgr == NULL) || (cmd == NULL)) {
-        return;
+        return -1;
     }
 
     if (cmd->version != VEHICLE_COMMAND_VERSION) {
-        return;
+        return -1;
     }
 
     switch (cmd->command_type) {
@@ -443,7 +443,7 @@ void vehicle_control_manager_handle_command(vehicle_control_manager_t *mgr,
 
     case VEHICLE_CMD_MOTION:
         if (mgr->emergency_stop_latched) {
-            return;
+            return -1;
         }
 
         mgr->active_cmd = *cmd;
@@ -478,6 +478,8 @@ void vehicle_control_manager_handle_command(vehicle_control_manager_t *mgr,
     default:
         break;
     }
+
+    return 0;
 }
 
 /**
@@ -645,4 +647,10 @@ static void run_motor_driver_thread(void *p1, void *p2, void *p3)
 
         k_msleep(20);
     }
+}
+
+int vehicle_control_manager_submit_command( const vehicle_motion_command_t *cmd ) {
+    vehicle_control_manager_handle_command( get_vehicle_manager_inst(), cmd );
+
+    return 0;
 }

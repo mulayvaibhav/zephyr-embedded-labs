@@ -5,7 +5,14 @@
 #include "vehicle_ipc_wire.h"
 #include "rpmsg_processor.h"
 
+#include "vehicle_command.h"
+#include "vehicle_control_manager.h"
+
 static struct rpmsg_endpoint vehicle_cmd_ept;
+
+static void convert_wire_to_vehicle_command(
+    const vehicle_motion_command_wire_t *wire,
+    vehicle_motion_command_t *cmd);
 
 static uint32_t vehicle_get_time_ms(void)
 {
@@ -74,19 +81,29 @@ static int vehicle_cmd_rpmsg_cb(struct rpmsg_endpoint *ept,
 
     if (cmd.linear_x < -1000 || cmd.linear_x > 1000 ||
         cmd.angular_z < -1000 || cmd.angular_z > 1000) {
+
         vehicle_send_ack(ept, src, cmd.sequence_id,
                          VEHICLE_ACK_STATUS_INVALID_RANGE,
                          0);
+        
         return RPMSG_SUCCESS;
     }
 
-    /*
-     * At this point M33 has received and validated the binary command.
-     *
-     * Later:
-     *   convert cmd -> vehicle_motion_command_t
-     *   call vehicle_control_manager_submit_command(...)
-     */
+    vehicle_motion_command_t vehicle_cmd;
+    convert_wire_to_vehicle_command(&cmd, &vehicle_cmd);
+
+    int ret = vehicle_control_manager_submit_command(&vehicle_cmd);
+    if (ret == 0) {
+        vehicle_send_ack(ept, src, cmd.sequence_id,
+                        VEHICLE_ACK_STATUS_OK,
+                        0);
+        return RPMSG_SUCCESS;
+    } else {
+        vehicle_send_ack(ept, src, cmd.sequence_id,
+                        VEHICLE_ACK_STATUS_REJECTED,
+                        (uint16_t)(-ret));
+        return RPMSG_SUCCESS;
+    }
 
     vehicle_send_ack(ept, src, cmd.sequence_id,
                      VEHICLE_ACK_STATUS_OK,
@@ -104,4 +121,25 @@ int vehicle_cmd_rpmsg_start(struct rpmsg_device *rpdev)
                             RPMSG_ADDR_ANY,
                             vehicle_cmd_rpmsg_cb,
                             NULL);
+}
+
+static void convert_wire_to_vehicle_command(
+    const vehicle_motion_command_wire_t *wire,
+    vehicle_motion_command_t *cmd)
+{
+    memset(cmd, 0, sizeof(*cmd));
+
+    cmd->version = wire->version;
+    cmd->source = wire->source;
+    cmd->command_type = wire->command_type;
+    cmd->control_mode = wire->control_mode;
+
+    cmd->linear_x = wire->linear_x;
+    cmd->angular_z = wire->angular_z;
+
+    cmd->speed_limit_pct = wire->speed_limit_pct;
+    cmd->ttl_ms = wire->ttl_ms;
+
+    cmd->sequence_id = wire->sequence_id;
+    cmd->timestamp_ms = wire->timestamp_ms;
 }
