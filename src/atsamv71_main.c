@@ -8,6 +8,7 @@
 #include "vehicle_control_manager.h"
 #include "motor_driver.h"
 #include "bluetooth_rx.h"
+#include "echo_server.h"
 
 int main(void)
 {
@@ -45,6 +46,8 @@ int main(void)
 
 
     bluetooth_rx_init();
+
+    echo_server();
 
     while (1) {        
         k_sleep(K_SECONDS(1));

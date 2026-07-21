@@ -1,0 +1,11 @@
+mainmenu "Zephyr Embedded Labs"
+
+config NET_SAMPLE_NUM_HANDLERS
+    int "Number of simultaneous echo-server handlers"
+    default 1
+    range 1 10
+    help
+      Number of simultaneous client connections handled by
+      the imported echo-server sample.
+
+source "Kconfig.zephyr"

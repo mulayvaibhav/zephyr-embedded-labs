@@ -30,6 +30,11 @@ if("${HW_BOARD}" STREQUAL "ATSAMV71")
 
         apps/bluetooth_rx/bluetooth_rx.c
         apps/vehicle_control_manager/vehicle_control_manager.c
+        apps/vehicle_command_parser/vehicle_ipc_msg_processor.c
+        
+        apps/net/udp.c
+        apps/net/tcp.c
+        apps/net/echo-server.c
 
         drivers/motor_driver/motor_driver.c
     )
@@ -55,6 +60,7 @@ if("${HW_BOARD}" STREQUAL "ATSAMV71")
     target_include_directories(app PRIVATE
         apps/bluetooth_rx
         apps/vehicle_control_manager
+        apps/net
 
         drivers/motor_driver
     )
